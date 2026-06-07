@@ -5,81 +5,100 @@
 #define BUFFER_SIZE 42
 #endif
 
-size_t	ft_strlen(char *s)
+char *ft_strchr(char *s, int c)
 {
-	size_t i = 0;
-	while (s && s[i])
-		i++;
-	return i;
+  int i = 0;
+  if(!s)
+    return NULL;
+  while(s[i])
+  {
+        if (s[i] == (char)c)
+            return s + i;
+       
+            i++;
+  }
+    return NULL;
 }
 
-char	*ft_strchr(char *s, int c)
+void *ft_memcpy(void *dest, const void *src, size_t n)
 {
-	int i = 0;
-	while (s && s[i])
-	{
-		if (s[i] == (char)c)
-			return s + i;
-		i++;
-	}
-	return NULL;
+    size_t i =0;
+  while(i < n)
+  {
+    ((char *)dest)[i] = ((char *)src)[i];
+    i++;
+  }
+  return dest;
 }
 
-void	*ft_memcpy(void *d, void *s, size_t n)
+size_t ft_strlen(char *s)
 {
-	size_t i = 0;
-	while (i < n)
-	{
-		((char *)d)[i] = ((char *)s)[i];
-		i++;
-	}
-	return d;
+  size_t res = 0;
+  if(!s)
+    return 0;
+  while (s[res] )
+  {
+    res++;
+  }
+  return res;
 }
 
-char	*join(char *s1, char *s2, int n)
+int str_append_mem(char **s1, char *s2, size_t size2)
 {
-	char *r = malloc(ft_strlen(s1) + n + 1);
-	int i = 0, j = 0;
-
-	if (!r) {
-		free(s1);
-		return NULL;
-	}
-	while (s1 && s1[i])
-		r[j++] = s1[i++];
-	i = 0;
-	while (i < n)
-		r[j++] = s2[i++];
-	r[j] = 0;
-	free(s1);
-	return r;
+  size_t size1 = ft_strlen(*s1);
+  char *tmp = malloc(size2 + size1 + 1);
+  if (!tmp)
+    return 0;
+  if(*s1)
+    ft_memcpy(tmp, *s1, size1);
+  ft_memcpy(tmp + size1, s2, size2);
+  tmp[size1 + size2] = '\0';
+  free(*s1);
+  *s1 = tmp;
+  return 1; 
 }
 
-char	*get_next_line(int fd)
+char *get_next_line(int fd)
 {
-	static char buf[BUFFER_SIZE + 1];
-	char *line = NULL;
-	char *nl;
-	int r;
-
-	while (1)
-	{
-		if ((nl = ft_strchr(buf, '\n')))
-		{
-			line = join(line, buf, nl - buf + 1);
-			ft_memcpy(buf, nl + 1, ft_strlen(nl + 1) + 1);
-			return line;
-		}
-		line = join(line, buf, ft_strlen(buf));
-		r = read(fd, buf, BUFFER_SIZE);
-		if (r <= 0)
-		{
-			buf[0] = 0;
-			if (line && *line)
-				return line;
-			free(line);
-			return NULL;
-		}
-		buf[r] = 0;
-	}
+  static char b[BUFFER_SIZE + 1] = "";
+  char *ret = NULL;
+  char *tmp ;
+  int read_ret;
+  
+  if (fd < 0 || BUFFER_SIZE <= 0)
+    return (NULL);
+  
+  while(1)
+  {
+    tmp = ft_strchr(b, '\n');
+    if(tmp)
+    {
+          if (!str_append_mem(&ret, b, tmp - b + 1))
+          {
+            free(ret);
+            return NULL;
+          }
+          ft_memcpy(b, tmp + 1, ft_strlen(tmp + 1) + 1);
+          return ret;
+    }
+    if(b[0] != '\0')
+    {
+        if(!str_append_mem(&ret, b, ft_strlen(b)))
+        {
+            free(ret);
+            return NULL;
+        }
+    }
+        
+    read_ret = read(fd, b, BUFFER_SIZE);
+    if (read_ret <= 0)
+    {
+        b[0] = '\0';
+        if(read_ret == 0 && ret && *ret)
+            return ret;
+        free(ret);
+        return NULL;
+    }
+    b[read_ret] = 0;
+  }
 }
