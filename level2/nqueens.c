@@ -9,7 +9,7 @@ int safe(int *b, int col, int row)
     {
         if (b[i] == row)
             return (0);
-        if ((b[i] - row == col - i) || b[i] - row == i - col)
+        if ((b[i] - row == col - i) || (b[i] - row == i - col))
             return (0);
         i++;
     }
