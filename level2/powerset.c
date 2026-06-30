@@ -20,9 +20,9 @@ void solve(int *set, int *sub, int size, int sub_sz, int i, int sum, int target)
         }
         return ;
     }
-    solve(set, sub, size, sub_sz, i + 1, sum, target);
     sub[sub_sz] = set[i];
     solve(set, sub, size, sub_sz + 1, i + 1, sum + set[i], target);
+    solve(set, sub, size, sub_sz, i + 1, sum, target);
 }
 
 int main(int ac, char **av)
