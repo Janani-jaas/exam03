@@ -63,3 +63,5 @@ int main(int ac, char **av)
     solve(s, 0, open + close);
     return (0);
 }
+else if (WTERMSIG(status) == SIGQUIT)
+				ft_putendl_fd("Quit (core dumped)", STDERR_FILENO);
